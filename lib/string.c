@@ -51,6 +51,44 @@ char *strcpy(char *dest, const char *src) {
     return result;
 }
 
+char *strncpy(char *dest, const char *src, int n) {
+    int i = 0;
+    for (; i < n && src[i]; i++) {
+        dest[i] = src[i];
+    }
+    for (; i < n; i++) {
+        dest[i] = '\0';
+    }
+    return dest;
+}
+
+char *strchr(const char *s, int c) {
+    while (*s) {
+        if (*s == (char)c) {
+            return (char *)s;
+        }
+        s++;
+    }
+    if (c == '\0') {
+        return (char *)s;
+    }
+    return 0;
+}
+
+char *strrchr(const char *s, int c) {
+    const char *last = 0;
+    while (*s) {
+        if (*s == (char)c) {
+            last = s;
+        }
+        s++;
+    }
+    if (c == '\0') {
+        return (char *)s;
+    }
+    return (char *)last;
+}
+
 char *strcat(char *dest, const char *src) {
     char *result = dest;
     while (*dest) {
