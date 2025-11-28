@@ -3,9 +3,9 @@ CC = gcc
 ASM = nasm
 
 CFLAGS = -m32 -ffreestanding -fno-builtin -fno-stack-protector \
-         -nostdlib -nostdinc -Wall -Wextra -std=gnu99 -c
+         -nostdlib -nostdinc -Wall -Wextra -std=gnu99 -fno-pie -fno-pic -c
 ASMFLAGS = -f elf
-LDFLAGS = -m32 -nostdlib -nostdinc -ffreestanding -T linker.ld
+LDFLAGS = -m32 -nostdlib -nostdinc -ffreestanding -T linker.ld -no-pie
 
 KERNEL_SOURCES = \
 	kernel/kernel.c \
