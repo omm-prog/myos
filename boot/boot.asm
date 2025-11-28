@@ -1,4 +1,4 @@
-%include "multiboot_header.asm"
+%include "boot/multiboot_header.asm"
 
 section .text
     global _start
