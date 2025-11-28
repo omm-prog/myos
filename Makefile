@@ -16,6 +16,8 @@ KERNEL_SOURCES = \
 	drivers/io.c \
 	honeypot/honeypot.c \
 	auto/auto.c \
+	kernel/scheduler.c \
+	net/network.c \
 	fs/vfs.c \
 	lib/string.c \
 	lib/memory.c

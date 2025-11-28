@@ -6,5 +6,6 @@ void auto_status();
 void auto_update();
 void auto_cleanup();
 void auto_optimize();
+void auto_tick();
 
 #endif

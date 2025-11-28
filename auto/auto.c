@@ -46,3 +46,7 @@ void auto_optimize() {
     vfs_append("auto.log", "Optimization cycle completed.");
     serial_write_string("[AUTO] Optimization executed\n");
 }
+
+void auto_tick() {
+    auto_update();
+}

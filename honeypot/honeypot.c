@@ -17,6 +17,7 @@ static honeypot_service services[] = {
 };
 
 static int total_attacks = 0;
+static int monitor_ticks = 0;
 
 void honeypot_init() {
     print_string("  - Port 22 (SSH) honeypot\n");
@@ -43,7 +44,10 @@ void honeypot_status() {
 }
 
 void honeypot_monitor_ports() {
-    /* placeholder for future network integration */
+    monitor_ticks++;
+    if ((monitor_ticks % 10) == 0) {
+        vfs_append("/honeypot.log", "Background port sweep detected.");
+    }
 }
 
 void log_attack(char *source, int port, char *attack_type) {

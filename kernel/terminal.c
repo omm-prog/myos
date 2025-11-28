@@ -4,6 +4,8 @@
 #include "../honeypot/honeypot.h"
 #include "../auto/auto.h"
 #include "../fs/vfs.h"
+#include "../net/network.h"
+#include "scheduler.h"
 
 #define MAX_PATH_SEGMENTS 16
 
@@ -25,6 +27,9 @@ static void handle_scan(char *args);
 static void handle_simulate(char *args);
 static void handle_alerts(void);
 static void handle_threatlog(void);
+static void handle_tasks(void);
+static void handle_tick(void);
+static void handle_netstat(void);
 static int parse_int(const char *text);
 
 void terminal_init(void) {
@@ -39,6 +44,7 @@ void terminal_init(void) {
 void terminal_run(void) {
     char input[128];
     while (1) {
+        scheduler_tick();
         print_prompt();
         read_string(input, sizeof(input));
         terminal_handle_command(input);
@@ -75,6 +81,12 @@ static void terminal_handle_command(char *input) {
         handle_alerts();
     } else if (strcmp(cmd, "threatlog") == 0) {
         handle_threatlog();
+    } else if (strcmp(cmd, "tasks") == 0) {
+        handle_tasks();
+    } else if (strcmp(cmd, "tick") == 0) {
+        handle_tick();
+    } else if (strcmp(cmd, "netstat") == 0) {
+        handle_netstat();
     } else if (strncmp(cmd, "scan", 4) == 0 && (cmd[4] == '\0' || cmd[4] == ' ' || cmd[4] == '\t')) {
         handle_scan(cmd + 4);
     } else if (strncmp(cmd, "simulate", 8) == 0 && (cmd[8] == '\0' || cmd[8] == ' ' || cmd[8] == '\t')) {
@@ -102,6 +114,9 @@ static void show_help(void) {
     print_string("  threatlog      View security log\n");
     print_string("  scan <target>  Simulate threat scan\n");
     print_string("  simulate <p>   Simulate attack on port\n");
+    print_string("  netstat        Show network monitor stats\n");
+    print_string("  tasks          List scheduled tasks\n");
+    print_string("  tick           Advance scheduler manually\n");
     print_string("  auto           Auto-system status\n");
     print_string("  reboot         Return to firmware\n");
 }
@@ -335,6 +350,19 @@ static void handle_threatlog(void) {
     } else {
         print_string("Security log missing.\n");
     }
+}
+
+static void handle_tasks(void) {
+    scheduler_list();
+}
+
+static void handle_tick(void) {
+    scheduler_tick();
+    print_string("Tick executed.\n");
+}
+
+static void handle_netstat(void) {
+    network_status();
 }
 
 static int parse_int(const char *text) {
