@@ -8,6 +8,7 @@ typedef struct {
     unsigned int packets_seen;
     unsigned int alerts_raised;
     unsigned int seed;
+    char ip_address[16];
 } network_state;
 
 static network_state state;
@@ -21,6 +22,7 @@ void network_init(void) {
     state.packets_seen = 0;
     state.alerts_raised = 0;
     state.seed = 0xBEEF1234;
+    strcpy(state.ip_address, "10.0.2.15");
     vfs_append("/security.log", "Network monitor initialized.");
 }
 
@@ -57,6 +59,12 @@ void network_status(void) {
     print_int(state.packets_seen);
     print_string("\n  Alerts raised: ");
     print_int(state.alerts_raised);
+    print_string("\n  Local IP: ");
+    print_string(state.ip_address);
     print_string("\n");
+}
+
+const char *network_get_ip(void) {
+    return state.ip_address;
 }
 

@@ -30,6 +30,7 @@ static void handle_threatlog(void);
 static void handle_tasks(void);
 static void handle_tick(void);
 static void handle_netstat(void);
+static void handle_ip(void);
 static int parse_int(const char *text);
 
 void terminal_init(void) {
@@ -87,6 +88,8 @@ static void terminal_handle_command(char *input) {
         handle_tick();
     } else if (strcmp(cmd, "netstat") == 0) {
         handle_netstat();
+    } else if (strcmp(cmd, "ip") == 0) {
+        handle_ip();
     } else if (strncmp(cmd, "scan", 4) == 0 && (cmd[4] == '\0' || cmd[4] == ' ' || cmd[4] == '\t')) {
         handle_scan(cmd + 4);
     } else if (strncmp(cmd, "simulate", 8) == 0 && (cmd[8] == '\0' || cmd[8] == ' ' || cmd[8] == '\t')) {
@@ -115,6 +118,7 @@ static void show_help(void) {
     print_string("  scan <target>  Simulate threat scan\n");
     print_string("  simulate <p>   Simulate attack on port\n");
     print_string("  netstat        Show network monitor stats\n");
+    print_string("  ip             Show local IP address\n");
     print_string("  tasks          List scheduled tasks\n");
     print_string("  tick           Advance scheduler manually\n");
     print_string("  auto           Auto-system status\n");
@@ -363,6 +367,13 @@ static void handle_tick(void) {
 
 static void handle_netstat(void) {
     network_status();
+}
+
+static void handle_ip(void) {
+    const char *ip = network_get_ip();
+    print_string("Local IP address: ");
+    print_string(ip ? ip : "unknown");
+    print_string("\n");
 }
 
 static int parse_int(const char *text) {
