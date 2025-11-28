@@ -30,7 +30,7 @@ static void handle_threatlog(void);
 static void handle_tasks(void);
 static void handle_tick(void);
 static void handle_netstat(void);
-static void handle_ip(void);
+static void handle_ip(char *args);
 static int parse_int(const char *text);
 
 void terminal_init(void) {
@@ -88,8 +88,8 @@ static void terminal_handle_command(char *input) {
         handle_tick();
     } else if (strcmp(cmd, "netstat") == 0) {
         handle_netstat();
-    } else if (strcmp(cmd, "ip") == 0) {
-        handle_ip();
+    } else if (strncmp(cmd, "ip", 2) == 0 && (cmd[2] == '\0' || cmd[2] == ' ' || cmd[2] == '\t')) {
+        handle_ip(cmd + 2);
     } else if (strncmp(cmd, "scan", 4) == 0 && (cmd[4] == '\0' || cmd[4] == ' ' || cmd[4] == '\t')) {
         handle_scan(cmd + 4);
     } else if (strncmp(cmd, "simulate", 8) == 0 && (cmd[8] == '\0' || cmd[8] == ' ' || cmd[8] == '\t')) {
@@ -118,7 +118,7 @@ static void show_help(void) {
     print_string("  scan <target>  Simulate threat scan\n");
     print_string("  simulate <p>   Simulate attack on port\n");
     print_string("  netstat        Show network monitor stats\n");
-    print_string("  ip             Show local IP address\n");
+    print_string("  ip [set a.b.c.d] Show or set local IP\n");
     print_string("  tasks          List scheduled tasks\n");
     print_string("  tick           Advance scheduler manually\n");
     print_string("  auto           Auto-system status\n");
@@ -369,11 +369,34 @@ static void handle_netstat(void) {
     network_status();
 }
 
-static void handle_ip(void) {
-    const char *ip = network_get_ip();
-    print_string("Local IP address: ");
-    print_string(ip ? ip : "unknown");
-    print_string("\n");
+static void handle_ip(char *args) {
+    char *sub = skip_spaces(args);
+    if (*sub == '\0') {
+        const char *ip = network_get_ip();
+        print_string("Local IP address: ");
+        print_string(ip ? ip : "unknown");
+        print_string("\n");
+        return;
+    }
+
+    if (strncmp(sub, "set", 3) != 0 || (sub[3] != '\0' && sub[3] != ' ' && sub[3] != '\t')) {
+        print_string("Usage: ip [set a.b.c.d]\n");
+        return;
+    }
+
+    char *addr = skip_spaces(sub + 3);
+    if (*addr == '\0') {
+        print_string("Usage: ip set a.b.c.d\n");
+        return;
+    }
+
+    if (network_set_ip(addr) == 0) {
+        print_string("IP updated to ");
+        print_string(addr);
+        print_string("\n");
+    } else {
+        print_string("Invalid IP address.\n");
+    }
 }
 
 static int parse_int(const char *text) {

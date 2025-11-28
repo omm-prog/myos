@@ -12,6 +12,7 @@ typedef struct {
 } network_state;
 
 static network_state state;
+static const char *IP_CONFIG_PATH = "/network/ip.cfg";
 
 static unsigned int prng_next(void) {
     state.seed = (state.seed * 1664525u + 1013904223u);
@@ -22,7 +23,14 @@ void network_init(void) {
     state.packets_seen = 0;
     state.alerts_raised = 0;
     state.seed = 0xBEEF1234;
-    strcpy(state.ip_address, "10.0.2.15");
+    vfs_mkdir("/network");
+    const char *saved = vfs_read(IP_CONFIG_PATH);
+    if (saved && strlen(saved) < sizeof(state.ip_address)) {
+        strcpy(state.ip_address, saved);
+    } else {
+        strcpy(state.ip_address, "0.0.0.0");
+        vfs_create(IP_CONFIG_PATH, state.ip_address);
+    }
     vfs_append("/security.log", "Network monitor initialized.");
 }
 
@@ -66,5 +74,44 @@ void network_status(void) {
 
 const char *network_get_ip(void) {
     return state.ip_address;
+}
+
+static int validate_ip(const char *ip) {
+    int segments = 0;
+    int value = 0;
+    int digits = 0;
+
+    while (*ip) {
+        if (*ip >= '0' && *ip <= '9') {
+            value = value * 10 + (*ip - '0');
+            if (value > 255) {
+                return 0;
+            }
+            digits++;
+        } else if (*ip == '.') {
+            if (digits == 0) {
+                return 0;
+            }
+            segments++;
+            value = 0;
+            digits = 0;
+        } else {
+            return 0;
+        }
+        ip++;
+    }
+    return (segments == 3 && digits > 0);
+}
+
+int network_set_ip(const char *ip) {
+    if (!ip || !validate_ip(ip)) {
+        return -1;
+    }
+    strncpy(state.ip_address, ip, sizeof(state.ip_address) - 1);
+    state.ip_address[sizeof(state.ip_address) - 1] = '\0';
+    vfs_create(IP_CONFIG_PATH, state.ip_address);
+    vfs_write(IP_CONFIG_PATH, state.ip_address);
+    vfs_append("/security.log", "IP address updated.");
+    return 0;
 }
 
