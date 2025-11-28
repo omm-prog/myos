@@ -1,9 +1,6 @@
 #ifndef VFS_H
 #define VFS_H
 
-#ifndef VFS_H
-#define VFS_H
-
 #define VFS_NAME_LEN 32
 #define VFS_PATH_LEN 64
 
@@ -18,4 +15,3 @@ int vfs_exists(const char *path);
 int vfs_is_dir(const char *path);
 
 #endif
-
