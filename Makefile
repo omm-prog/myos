@@ -31,7 +31,7 @@ ISO = myos.iso
 all: $(KERNEL)
 
 $(KERNEL): $(ASSEMBLY_OBJECTS) $(KERNEL_OBJECTS) linker.ld
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $(ASSEMBLY_OBJECTS) $(KERNEL_OBJECTS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
