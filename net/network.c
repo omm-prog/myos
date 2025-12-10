@@ -28,7 +28,7 @@ void network_init(void) {
     if (saved && strlen(saved) < sizeof(state.ip_address)) {
         strcpy(state.ip_address, saved);
     } else {
-        strcpy(state.ip_address, "0.0.0.0");
+        strcpy(state.ip_address, "172.20.10.5");
         vfs_create(IP_CONFIG_PATH, state.ip_address);
     }
     vfs_append("/security.log", "Network monitor initialized.");
